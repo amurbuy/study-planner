@@ -1,6 +1,7 @@
 package com.example.studyplanner.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.studyplanner.components.EmptyState
+import com.example.studyplanner.components.SubjectFilterRow
 import com.example.studyplanner.components.TaskCard
 import com.example.studyplanner.viewmodel.TaskListViewModel
 
@@ -41,26 +43,35 @@ fun TaskListScreen(
             }
         }
     ) { innerPadding ->
-        if (uiState.tasks.isEmpty()) {
-            EmptyState(
-                title = "No tasks yet",
-                message = "Tap + to add your first study task",
-                modifier = Modifier.padding(innerPadding)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            SubjectFilterRow(
+                selectedSubject = uiState.selectedSubject,
+                onSubjectSelected = { viewModel.onSubjectSelected(it) },
+                modifier = Modifier.padding(vertical = 8.dp)
             )
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                items(uiState.tasks, key = { it.id }) { task ->
-                    TaskCard(
-                        task = task,
-                        onClick = { onTaskClick(task.id) },
-                        onToggleCompleted = { viewModel.onToggleCompleted(task.id) }
-                    )
+
+            if (uiState.tasks.isEmpty()) {
+                EmptyState(
+                    title = if (uiState.selectedSubject == null) "No tasks yet" else "No tasks for this subject",
+                    message = "Tap + to add a new study task"
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    items(uiState.tasks, key = { it.id }) { task ->
+                        TaskCard(
+                            task = task,
+                            onClick = { onTaskClick(task.id) },
+                            onToggleCompleted = { viewModel.onToggleCompleted(task.id) }
+                        )
+                    }
                 }
             }
         }
