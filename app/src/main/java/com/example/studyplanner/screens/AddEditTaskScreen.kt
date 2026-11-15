@@ -60,6 +60,8 @@ fun AddEditTaskScreen(
                 onValueChange = { viewModel.onTitleChange(it) },
                 label = { Text("Title") },
                 singleLine = true,
+                isError = uiState.titleError != null,
+                supportingText = { uiState.titleError?.let { Text(it) } },
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -77,6 +79,8 @@ fun AddEditTaskScreen(
                 label = { Text("Due date") },
                 placeholder = { Text("e.g. 25 Nov 2026") },
                 singleLine = true,
+                isError = uiState.dueDateError != null,
+                supportingText = { uiState.dueDateError?.let { Text(it) } },
                 modifier = Modifier.fillMaxWidth()
             )
 
