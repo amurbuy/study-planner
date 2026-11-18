@@ -34,6 +34,12 @@ import com.example.studyplanner.components.EmptyState
 import com.example.studyplanner.components.PriorityChip
 import com.example.studyplanner.components.SubjectChip
 import com.example.studyplanner.viewmodel.TaskDetailViewModel
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+
 
 @Composable
 fun TaskDetailScreen(
@@ -43,6 +49,8 @@ fun TaskDetailScreen(
     viewModel: TaskDetailViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(taskId) {
         viewModel.loadTask(taskId)
@@ -107,10 +115,7 @@ fun TaskDetailScreen(
                 }
 
                 OutlinedButton(
-                    onClick = {
-                        viewModel.deleteTask()
-                        onBack()
-                    },
+                    onClick = { showDeleteDialog = true },
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = MaterialTheme.colorScheme.error
                     ),
@@ -120,6 +125,27 @@ fun TaskDetailScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Delete")
                 }
+            }
+            if (showDeleteDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteDialog = false },
+                    title = { Text("Delete task?") },
+                    text = { Text("\"${task.title}\" will be deleted permanently.") },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            showDeleteDialog = false
+                            viewModel.deleteTask()
+                            onBack()
+                        }) {
+                            Text("Delete")
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteDialog = false }) {
+                            Text("Cancel")
+                        }
+                    }
+                )
             }
         }
     }
