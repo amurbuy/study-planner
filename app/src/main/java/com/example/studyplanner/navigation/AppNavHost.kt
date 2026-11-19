@@ -39,7 +39,17 @@ fun AppNavHost(
             TaskDetailScreen(
                 taskId = taskId,
                 onBack = { navController.popBackStack() },
-                onEditClick = { }
+                onEditClick = { id -> navController.navigate("edit_task/$id") }
+            )
+        }
+        composable(
+            route = "edit_task/{taskId}",
+            arguments = listOf(navArgument("taskId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val taskId = backStackEntry.arguments?.getInt("taskId") ?: 0
+            AddEditTaskScreen(
+                taskId = taskId,
+                onBack = { navController.popBackStack() }
             )
         }
 
