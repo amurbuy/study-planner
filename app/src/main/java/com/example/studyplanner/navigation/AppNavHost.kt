@@ -6,6 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.studyplanner.screens.TaskListScreen
+import com.example.studyplanner.screens.AddEditTaskScreen
+
 
 @Composable
 fun AppNavHost(
@@ -16,7 +18,13 @@ fun AppNavHost(
         composable("task_list") {
             TaskListScreen(
                 onTaskClick = { },
-                onAddClick = { }
+                onAddClick = { navController.navigate("add_task") }
+            )
+        }
+        composable("add_task") {
+            AddEditTaskScreen(
+                taskId = null,
+                onBack = { navController.popBackStack() }
             )
         }
     }
