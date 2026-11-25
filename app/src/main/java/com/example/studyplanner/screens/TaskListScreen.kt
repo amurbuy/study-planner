@@ -25,12 +25,17 @@ import com.example.studyplanner.components.TaskCard
 import com.example.studyplanner.viewmodel.TaskListViewModel
 import androidx.compose.material3.TextButton
 import com.example.studyplanner.components.AppTopBar
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.IconButton
 
 @Composable
 fun TaskListScreen(
     onTaskClick: (Int) -> Unit,
     onAddClick: () -> Unit,
     onStatsClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     viewModel: TaskListViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -41,6 +46,9 @@ fun TaskListScreen(
                 title = "Study Planner",
                 actions = {
                     TextButton(onClick = onStatsClick) { Text("Stats") }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                    }
                 }
             )
         },

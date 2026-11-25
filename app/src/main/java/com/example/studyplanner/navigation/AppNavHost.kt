@@ -11,6 +11,7 @@ import com.example.studyplanner.screens.AddEditTaskScreen
 import com.example.studyplanner.screens.StatsScreen
 import com.example.studyplanner.screens.TaskDetailScreen
 import com.example.studyplanner.screens.TaskListScreen
+import com.example.studyplanner.screens.SettingsScreen
 
 @Composable
 fun AppNavHost(
@@ -22,7 +23,8 @@ fun AppNavHost(
             TaskListScreen(
                 onTaskClick = { taskId -> navController.navigate("task_detail/$taskId") },
                 onAddClick = { navController.navigate("add_task") },
-                onStatsClick = { navController.navigate("stats") }
+                onStatsClick = { navController.navigate("stats") },
+                onSettingsClick = { navController.navigate("settings") }
             )
         }
 
@@ -58,6 +60,10 @@ fun AppNavHost(
 
         composable("stats") {
             StatsScreen(onBack = { navController.navigateUp() })
+        }
+
+        composable("settings") {
+            SettingsScreen(onBack = { navController.navigateUp() })
         }
     }
 }
