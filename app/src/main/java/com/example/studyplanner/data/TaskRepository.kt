@@ -1,61 +1,62 @@
 package com.example.studyplanner.data
 
+import android.content.Context
+import com.example.studyplanner.data.local.StudyPlannerDatabase
+import com.example.studyplanner.data.local.TaskDao
+import com.example.studyplanner.data.local.TaskEntity
+import com.example.studyplanner.data.local.toEntity
+import com.example.studyplanner.data.local.toStudyTask
 import com.example.studyplanner.model.Priority
 import com.example.studyplanner.model.StudyTask
 import com.example.studyplanner.model.Subject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 object TaskRepository {
 
-    private val _tasks = MutableStateFlow(sampleTasks())
-    val tasks: StateFlow<List<StudyTask>> = _tasks.asStateFlow()
+    private lateinit var taskDao: TaskDao
 
-    private var nextId = (_tasks.value.maxOfOrNull { it.id } ?: 0) + 1
+    // Called once from MainActivity before any screen is shown
+    fun init(context: Context) {
+        taskDao = StudyPlannerDatabase.getDatabase(context).taskDao()
+    }
 
-    fun getTaskById(id: Int): StudyTask? =
-        _tasks.value.find { it.id == id }
+    val tasks: Flow<List<StudyTask>>
+        get() = taskDao.getAllTasks().map { entities ->
+            entities.map { it.toStudyTask() }
+        }
 
-    fun addTask(
+    suspend fun getTaskById(id: Int): StudyTask? =
+        taskDao.getTaskById(id)?.toStudyTask()
+
+    suspend fun addTask(
         title: String,
         description: String,
         subject: Subject,
         priority: Priority,
         dueDate: String
     ) {
-        val newTask = StudyTask(
-            id = nextId++,
-            title = title,
-            description = description,
-            subject = subject,
-            priority = priority,
-            dueDate = dueDate
+        taskDao.insertTask(
+            TaskEntity(
+                title = title,
+                description = description,
+                subject = subject.name,
+                priority = priority.name,
+                dueDate = dueDate
+            )
         )
-        _tasks.update { it + newTask }
     }
 
-    fun updateTask(task: StudyTask) {
-        _tasks.update { list -> list.map { if (it.id == task.id) task else it } }
+    suspend fun updateTask(task: StudyTask) {
+        taskDao.updateTask(task.toEntity())
     }
 
-    fun deleteTask(id: Int) {
-        _tasks.update { list -> list.filterNot { it.id == id } }
+    suspend fun deleteTask(id: Int) {
+        taskDao.deleteTaskById(id)
     }
 
-    fun toggleCompleted(id: Int) {
-        _tasks.update { list ->
-            list.map { if (it.id == id) it.copy(isCompleted = !it.isCompleted) else it }
-        }
+    suspend fun toggleCompleted(id: Int) {
+        val task = taskDao.getTaskById(id) ?: return
+        taskDao.updateTask(task.copy(isCompleted = !task.isCompleted))
     }
-
-    private fun sampleTasks(): List<StudyTask> = listOf(
-        StudyTask(1, "Calculus homework", "Exercises 4.1–4.5 from the textbook", Subject.MATH, Priority.HIGH, "20 Nov 2026"),
-        StudyTask(2, "Physics lab report", "Write report on pendulum experiment", Subject.PHYSICS, Priority.MEDIUM, "22 Nov 2026"),
-        StudyTask(3, "Android project", "Finish MVVM and navigation", Subject.PROGRAMMING, Priority.HIGH, "25 Nov 2026"),
-        StudyTask(4, "English essay", "500 words about technology in education", Subject.ENGLISH, Priority.LOW, "27 Nov 2026"),
-        StudyTask(5, "History test prep", "Review chapters 5 and 6", Subject.HISTORY, Priority.MEDIUM, "18 Nov 2026", isCompleted = true),
-        StudyTask(6, "Linear algebra quiz", "Matrices and determinants", Subject.MATH, Priority.MEDIUM, "19 Nov 2026", isCompleted = true)
-    )
 }

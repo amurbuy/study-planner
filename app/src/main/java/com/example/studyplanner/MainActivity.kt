@@ -6,10 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.studyplanner.navigation.AppNavHost
 import com.example.studyplanner.ui.theme.StudyPlannerTheme
+import com.example.studyplanner.data.TaskRepository
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TaskRepository.init(applicationContext)
         enableEdgeToEdge()
         setContent {
             StudyPlannerTheme {
