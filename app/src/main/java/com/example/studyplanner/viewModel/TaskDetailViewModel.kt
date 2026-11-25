@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class TaskDetailUiState(
     val task: StudyTask? = null
@@ -33,10 +34,17 @@ class TaskDetailViewModel : ViewModel() {
     }
 
     fun toggleCompleted() {
-        taskId.value?.let { repository.toggleCompleted(it) }
+        val id = taskId.value ?: return
+        viewModelScope.launch {
+            repository.toggleCompleted(id)
+        }
     }
 
-    fun deleteTask() {
-        taskId.value?.let { repository.deleteTask(it) }
+    fun deleteTask(onDeleted: () -> Unit) {
+        val id = taskId.value ?: return
+        viewModelScope.launch {
+            repository.deleteTask(id)
+            onDeleted()
+        }
     }
 }

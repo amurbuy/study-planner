@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 data class TaskListUiState(
     val tasks: List<StudyTask> = emptyList(),
@@ -39,6 +40,8 @@ class TaskListViewModel : ViewModel() {
     }
 
     fun onToggleCompleted(taskId: Int) {
-        repository.toggleCompleted(taskId)
+        viewModelScope.launch {
+            repository.toggleCompleted(taskId)
+        }
     }
 }
