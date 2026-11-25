@@ -142,8 +142,7 @@ fun TaskDetailScreen(
                     confirmButton = {
                         TextButton(onClick = {
                             showDeleteDialog = false
-                            viewModel.deleteTask()
-                            onBack()
+                            viewModel.deleteTask(onDeleted = onBack)
                         }) {
                             Text("Delete")
                         }

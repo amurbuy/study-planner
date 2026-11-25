@@ -1,6 +1,7 @@
 package com.example.studyplanner.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.studyplanner.data.TaskRepository
 import com.example.studyplanner.model.Priority
 import com.example.studyplanner.model.Subject
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class AddEditUiState(
     val taskId: Int? = null,
@@ -32,15 +34,17 @@ class AddEditTaskViewModel : ViewModel() {
 
     fun loadTask(taskId: Int) {
         if (_uiState.value.taskId == taskId) return
-        val task = repository.getTaskById(taskId) ?: return
-        _uiState.value = AddEditUiState(
-            taskId = task.id,
-            title = task.title,
-            description = task.description,
-            subject = task.subject,
-            priority = task.priority,
-            dueDate = task.dueDate
-        )
+        viewModelScope.launch {
+            val task = repository.getTaskById(taskId) ?: return@launch
+            _uiState.value = AddEditUiState(
+                taskId = task.id,
+                title = task.title,
+                description = task.description,
+                subject = task.subject,
+                priority = task.priority,
+                dueDate = task.dueDate
+            )
+        }
     }
 
     fun onTitleChange(value: String) =
@@ -58,7 +62,7 @@ class AddEditTaskViewModel : ViewModel() {
     fun onDueDateChange(value: String) =
         _uiState.update { it.copy(dueDate = value, dueDateError = null) }
 
-    fun saveTask() {
+    fun saveTask(onSaved: () -> Unit) {
         val state = _uiState.value
 
         val titleError = if (state.title.isBlank()) "Title cannot be empty" else null
@@ -69,28 +73,33 @@ class AddEditTaskViewModel : ViewModel() {
             return
         }
 
-        if (state.taskId == null) {
-            repository.addTask(
-                title = state.title.trim(),
-                description = state.description.trim(),
-                subject = state.subject,
-                priority = state.priority,
-                dueDate = state.dueDate.trim()
-            )
-        } else {
-            repository.getTaskById(state.taskId)?.let { existing ->
-                repository.updateTask(
-                    existing.copy(
-                        title = state.title.trim(),
-                        description = state.description.trim(),
-                        subject = state.subject,
-                        priority = state.priority,
-                        dueDate = state.dueDate.trim()
-                    )
-                )
-            }
-        }
-
+        // Stop a double tap on Save from adding the task twice
+        if (state.isSaved) return
         _uiState.update { it.copy(isSaved = true) }
+
+        viewModelScope.launch {
+            if (state.taskId == null) {
+                repository.addTask(
+                    title = state.title.trim(),
+                    description = state.description.trim(),
+                    subject = state.subject,
+                    priority = state.priority,
+                    dueDate = state.dueDate.trim()
+                )
+            } else {
+                repository.getTaskById(state.taskId)?.let { existing ->
+                    repository.updateTask(
+                        existing.copy(
+                            title = state.title.trim(),
+                            description = state.description.trim(),
+                            subject = state.subject,
+                            priority = state.priority,
+                            dueDate = state.dueDate.trim()
+                        )
+                    )
+                }
+            }
+            onSaved()
+        }
     }
 }

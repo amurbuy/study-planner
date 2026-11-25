@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.example.studyplanner.model.Subject
 import com.example.studyplanner.screens.AddEditTaskScreen
 import com.example.studyplanner.screens.BooksScreen
+import com.example.studyplanner.screens.SettingsScreen
 import com.example.studyplanner.screens.StatsScreen
 import com.example.studyplanner.screens.TaskDetailScreen
 import com.example.studyplanner.screens.TaskListScreen
@@ -25,7 +26,8 @@ fun AppNavHost(
                 onTaskClick = { taskId -> navController.navigate("task_detail/$taskId") },
                 onAddClick = { navController.navigate("add_task") },
                 onStatsClick = { navController.navigate("stats") },
-                onBooksClick = { navController.navigate("books") }
+                onBooksClick = { navController.navigate("books") },
+                onSettingsClick = { navController.navigate("settings") }
             )
         }
 
@@ -62,6 +64,10 @@ fun AppNavHost(
 
         composable("stats") {
             StatsScreen(onBack = { navController.navigateUp() })
+        }
+
+        composable("settings") {
+            SettingsScreen(onBack = { navController.navigateUp() })
         }
 
         composable("books") {

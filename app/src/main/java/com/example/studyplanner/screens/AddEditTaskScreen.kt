@@ -103,10 +103,7 @@ fun AddEditTaskScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Button(
-                onClick = {
-                    viewModel.saveTask()
-                    if (viewModel.uiState.value.isSaved) onBack()
-                },
+                onClick = { viewModel.saveTask(onSaved = onBack) },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(if (uiState.isEditMode) "Save changes" else "Add task")
