@@ -7,7 +7,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.studyplanner.model.Subject
 import com.example.studyplanner.screens.AddEditTaskScreen
+import com.example.studyplanner.screens.BooksScreen
 import com.example.studyplanner.screens.StatsScreen
 import com.example.studyplanner.screens.TaskDetailScreen
 import com.example.studyplanner.screens.TaskListScreen
@@ -22,7 +24,8 @@ fun AppNavHost(
             TaskListScreen(
                 onTaskClick = { taskId -> navController.navigate("task_detail/$taskId") },
                 onAddClick = { navController.navigate("add_task") },
-                onStatsClick = { navController.navigate("stats") }
+                onStatsClick = { navController.navigate("stats") },
+                onBooksClick = { navController.navigate("books") }
             )
         }
 
@@ -58,6 +61,13 @@ fun AppNavHost(
 
         composable("stats") {
             StatsScreen(onBack = { navController.navigateUp() })
+        }
+
+        composable("books") {
+            BooksScreen(
+                initialSubject = Subject.MATH,
+                onBack = { navController.navigateUp() }
+            )
         }
     }
 }

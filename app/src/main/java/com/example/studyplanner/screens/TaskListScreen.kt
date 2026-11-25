@@ -13,24 +13,25 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.studyplanner.components.AppTopBar
 import com.example.studyplanner.components.EmptyState
 import com.example.studyplanner.components.SubjectFilterRow
 import com.example.studyplanner.components.TaskCard
 import com.example.studyplanner.viewmodel.TaskListViewModel
-import androidx.compose.material3.TextButton
-import com.example.studyplanner.components.AppTopBar
 
 @Composable
 fun TaskListScreen(
     onTaskClick: (Int) -> Unit,
     onAddClick: () -> Unit,
     onStatsClick: () -> Unit,
+    onBooksClick: () -> Unit,
     viewModel: TaskListViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -40,6 +41,7 @@ fun TaskListScreen(
             AppTopBar(
                 title = "Study Planner",
                 actions = {
+                    TextButton(onClick = onBooksClick) { Text("Books") }
                     TextButton(onClick = onStatsClick) { Text("Stats") }
                 }
             )
