@@ -44,7 +44,8 @@ fun AppNavHost(
             TaskDetailScreen(
                 taskId = taskId,
                 onBack = { navController.popBackStack() },
-                onEditClick = { id -> navController.navigate("edit_task/$id") }
+                onEditClick = { id -> navController.navigate("edit_task/$id") },
+                onFindBooksClick = { subject -> navController.navigate("books/${subject.name}") }
             )
         }
 
@@ -66,6 +67,18 @@ fun AppNavHost(
         composable("books") {
             BooksScreen(
                 initialSubject = Subject.MATH,
+                onBack = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = "books/{subject}",
+            arguments = listOf(navArgument("subject") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val subjectName = backStackEntry.arguments?.getString("subject")
+            val subject = Subject.entries.find { it.name == subjectName } ?: Subject.MATH
+            BooksScreen(
+                initialSubject = subject,
                 onBack = { navController.navigateUp() }
             )
         }

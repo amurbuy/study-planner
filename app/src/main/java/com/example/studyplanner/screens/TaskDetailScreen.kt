@@ -15,6 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -22,10 +23,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,24 +38,19 @@ import com.example.studyplanner.components.AppTopBar
 import com.example.studyplanner.components.EmptyState
 import com.example.studyplanner.components.PriorityChip
 import com.example.studyplanner.components.SubjectChip
+import com.example.studyplanner.model.Subject
 import com.example.studyplanner.viewmodel.TaskDetailViewModel
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-
 
 @Composable
 fun TaskDetailScreen(
     taskId: Int,
     onBack: () -> Unit,
     onEditClick: (Int) -> Unit,
+    onFindBooksClick: (Subject) -> Unit,
     viewModel: TaskDetailViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
-
 
     LaunchedEffect(taskId) {
         viewModel.loadTask(taskId)
@@ -106,6 +106,13 @@ fun TaskDetailScreen(
                 }
 
                 OutlinedButton(
+                    onClick = { onFindBooksClick(task.subject) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Find books on ${task.subject.displayName}")
+                }
+
+                OutlinedButton(
                     onClick = { onEditClick(task.id) },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -126,6 +133,7 @@ fun TaskDetailScreen(
                     Text("Delete")
                 }
             }
+
             if (showDeleteDialog) {
                 AlertDialog(
                     onDismissRequest = { showDeleteDialog = false },
